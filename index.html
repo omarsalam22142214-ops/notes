@@ -18,6 +18,12 @@
             --time-color: #888;
             --badge-bg: #2ec4b6;
             --pin-color: #ffb703;
+            
+            /* ألوان الملاحظات (Light Mode) */
+            --note-red: #ffe5e5;
+            --note-blue: #e5f0ff;
+            --note-yellow: #fffde5;
+            --note-green: #e5ffe5;
         }
 
         [data-theme="dark"] {
@@ -30,6 +36,12 @@
             --time-color: #b0b3b8;
             --badge-bg: #20a094;
             --pin-color: #fb8500;
+            
+            /* ألوان الملاحظات (Dark Mode) - درجات غامقة ومريحة للعين */
+            --note-red: #4a2525;
+            --note-blue: #25334a;
+            --note-yellow: #4a4a25;
+            --note-green: #254a25;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Tajawal', sans-serif; }
@@ -45,7 +57,6 @@
             padding: 30px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.2);
         }
 
-        /* شاشة الدخول */
         #loginScreen { text-align: center; }
         #loginScreen input {
             width: 100%; padding: 12px; margin: 20px 0; border: 1px solid var(--border-color);
@@ -76,11 +87,28 @@
             width: 100%; padding: 12px; border: 1px solid var(--border-color); 
             border-radius: 8px; font-size: 16px; resize: vertical;
             background: var(--bg-color); color: var(--text-color); outline: none;
-            margin-bottom: 15px;
+            margin-bottom: 10px;
         }
         textarea:focus { border-color: var(--primary); }
 
-        /* أدوات الميديا */
+        /* باليتة الألوان الجديدة */
+        .color-palette {
+            display: flex; gap: 10px; margin-bottom: 15px; align-items: center;
+        }
+        .color-palette label { font-size: 14px; font-weight: bold; }
+        .color-circle {
+            width: 25px; height: 25px; border-radius: 50%; cursor: pointer;
+            border: 2px solid transparent; transition: 0.2s;
+        }
+        .color-circle:hover { transform: scale(1.1); }
+        .color-circle.active { border-color: var(--primary); transform: scale(1.2); box-shadow: 0 0 5px rgba(0,0,0,0.2); }
+        
+        .color-default { background-color: #ccc; }
+        .color-red { background-color: #ff6b6b; }
+        .color-blue { background-color: #4facfe; }
+        .color-yellow { background-color: #f6e58d; }
+        .color-green { background-color: #1dd1a1; }
+
         .media-tools { display: flex; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; }
         .media-btn {
             background: var(--note-bg); color: var(--text-color); border: 1px solid var(--border-color);
@@ -93,7 +121,6 @@
         @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.7; } 100% { opacity: 1; } }
         .attachment-status { font-size: 12px; color: var(--primary); font-weight: bold; display: flex; gap: 10px; margin-bottom: 15px;}
 
-        /* مؤشر التقييم */
         .score-container {
             display: flex; align-items: center; gap: 15px; margin-bottom: 20px;
             background: var(--note-bg); padding: 10px 15px; border-radius: 8px;
@@ -103,7 +130,6 @@
         input[type="range"] { flex: 1; cursor: pointer; accent-color: var(--primary); }
         .score-value { font-weight: bold; color: var(--primary); min-width: 45px; }
 
-        /* الأزرار العامة */
         button.btn { 
             background: var(--primary); color: #fff; border: none; padding: 12px 20px; 
             border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: bold; 
@@ -114,13 +140,19 @@
         button.btn.edit-mode { background: #f4a261; }
         button.btn.edit-mode:hover { background: #e76f51; }
 
-        /* قائمة الملاحظات */
         ul { list-style: none; margin-top: 20px; }
+        
+        /* تأثيرات ألوان الملاحظات في القائمة */
         li { 
             background: var(--note-bg); padding: 15px; margin-bottom: 15px; 
             border-radius: 8px; border-right: 4px solid var(--primary); 
-            position: relative; cursor: grab; transition: opacity 0.2s;
+            position: relative; cursor: grab; transition: opacity 0.2s, background-color 0.3s;
         }
+        li[data-color="red"] { background-color: var(--note-red); }
+        li[data-color="blue"] { background-color: var(--note-blue); }
+        li[data-color="yellow"] { background-color: var(--note-yellow); }
+        li[data-color="green"] { background-color: var(--note-green); }
+
         li:active { cursor: grabbing; }
         li.pinned-note { border-right-color: var(--pin-color); border-right-width: 6px; box-shadow: 0 4px 10px rgba(0,0,0,0.05);}
 
@@ -138,7 +170,7 @@
         .score-badge { background-color: var(--badge-bg); color: white; padding: 3px 8px; border-radius: 12px; font-weight: bold; font-size: 12px; }
         .pin-badge { color: var(--pin-color); font-weight: bold; font-size: 14px; }
 
-        .action-buttons { display: flex; gap: 5px; }
+        .action-buttons { display: flex; gap: 5px; flex-wrap: wrap;}
         .action-buttons button {
             color: white; border: none; padding: 5px 10px; 
             border-radius: 5px; cursor: pointer; font-size: 12px; transition: 0.2s;
@@ -149,6 +181,8 @@
         .edit-btn:hover { background: #e76f51; }
         .pin-btn { background: #457b9d; }
         .pin-btn.active { background: var(--pin-color); }
+        .copy-btn { background: #2a9d8f; } /* لون زرار النسخ */
+        .copy-btn:hover { background: #21867a; }
     </style>
 </head>
 <body>
@@ -173,6 +207,15 @@
 
             <textarea id="noteInput" rows="4" placeholder="اكتب ملاحظاتك الطويلة هنا..."></textarea>
             
+            <div class="color-palette">
+                <label>لون الملاحظة:</label>
+                <div class="color-circle color-default active" data-color="default" title="افتراضي"></div>
+                <div class="color-circle color-red" data-color="red" title="أحمر (مهم)"></div>
+                <div class="color-circle color-blue" data-color="blue" title="أزرق (عمل)"></div>
+                <div class="color-circle color-yellow" data-color="yellow" title="أصفر (أفكار)"></div>
+                <div class="color-circle color-green" data-color="green" title="أخضر (منجز)"></div>
+            </div>
+
             <div class="media-tools">
                 <button class="media-btn" id="uploadImgBtn">📷 إضافة صورة</button>
                 <input type="file" id="imageInput" accept="image/*" style="display: none;">
@@ -200,7 +243,6 @@
         import { getDatabase, ref as dbRef, push, onValue, remove, update } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
         import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
 
-        // إعدادات قاعدة البيانات الخاصة بك
         const firebaseConfig = {
             apiKey: "AIzaSyBtIkF-UhkeFa-cxutgJAQpR7K_IjKxloc",
             authDomain: "spygame-337ee.firebaseapp.com",
@@ -214,7 +256,6 @@
         const storage = getStorage(app);
         const notesRef = dbRef(db, 'secret_notes');
 
-        // ربط عناصر الـ HTML بالمتغيرات
         const loginScreen = document.getElementById('loginScreen');
         const appScreen = document.getElementById('appScreen');
         const passwordInput = document.getElementById('passwordInput');
@@ -238,15 +279,34 @@
         let editingNoteId = null;
         let draggedId = null;
         let draggedSortOrder = null;
+        let selectedNoteColor = 'default'; // متغير لحفظ اللون المختار
 
-        // متغيرات الميديا
         let selectedImageFile = null;
         let mediaRecorder;
         let audioChunks = [];
         let recordedAudioBlob = null;
         let isRecording = false;
 
-        // --- 1. نظام الدخول ---
+        // --- نظام اختيار الألوان ---
+        const colorCircles = document.querySelectorAll('.color-circle');
+        colorCircles.forEach(circle => {
+            circle.addEventListener('click', (e) => {
+                // بنشيل علامة الاختيار من كله ونحطها على اللي اختارناه
+                colorCircles.forEach(c => c.classList.remove('active'));
+                e.target.classList.add('active');
+                // بنحفظ كود اللون
+                selectedNoteColor = e.target.getAttribute('data-color');
+            });
+        });
+
+        // دالة لإعادة اللون للافتراضي بعد الحفظ
+        function resetColorPalette() {
+            colorCircles.forEach(c => c.classList.remove('active'));
+            document.querySelector('.color-circle[data-color="default"]').classList.add('active');
+            selectedNoteColor = 'default';
+        }
+
+        // --- نظام الدخول ---
         loginBtn.addEventListener('click', () => {
             if (passwordInput.value === SECRET_PASSWORD) {
                 loginScreen.style.display = 'none';
@@ -256,7 +316,7 @@
         });
         passwordInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') loginBtn.click(); });
 
-        // --- 2. اللايت / دارك مود ---
+        // --- اللايت / دارك مود ---
         let isDark = localStorage.getItem('theme') === 'dark';
         if(isDark) document.documentElement.setAttribute('data-theme', 'dark');
         updateThemeBtn();
@@ -268,36 +328,30 @@
         });
         function updateThemeBtn() { themeToggle.innerText = isDark ? '☀️ لايت مود' : '🌙 دارك مود'; }
 
-        // --- 3. البحث الفوري ---
+        // --- البحث الفوري ---
         searchInput.addEventListener('input', (e) => {
             const searchTerm = e.target.value.toLowerCase();
             document.querySelectorAll('#notesList li').forEach(li => {
-                // بنبحث جوه النص بتاع النوتة بس
                 const contentDiv = li.querySelector('.note-content');
                 const text = contentDiv ? contentDiv.innerText.toLowerCase() : '';
                 li.style.display = text.includes(searchTerm) ? 'block' : 'none';
             });
         });
 
-        // --- 4. تحديث رقم التقييم في الشاشة ---
         scoreInput.addEventListener('input', function() { scoreDisplay.innerText = this.value + '%'; });
 
-        // --- 5. التعامل مع الميديا (الصور والصوت) ---
+        // --- التعامل مع الميديا ---
         uploadImgBtn.addEventListener('click', () => {
             if(!editingNoteId) imageInput.click();
-            else alert("لا يمكن تغيير الصورة أثناء وضع التعديل. أضف ملاحظة جديدة.");
+            else alert("لا يمكن تغيير الصورة أثناء وضع التعديل.");
         });
-        
         imageInput.addEventListener('change', (e) => {
             selectedImageFile = e.target.files[0];
             if(selectedImageFile) imgStatus.innerText = '✔️ تم إرفاق الصورة';
         });
 
         recordAudioBtn.addEventListener('click', async () => {
-            if(editingNoteId) {
-                alert("لا يمكن تسجيل صوت أثناء وضع التعديل.");
-                return;
-            }
+            if(editingNoteId) { alert("لا يمكن تسجيل صوت أثناء وضع التعديل."); return; }
             if (!isRecording) {
                 try {
                     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -322,14 +376,13 @@
             }
         });
 
-        // --- 6. الإضافة والتعديل ---
+        // --- الإضافة والتعديل ---
         addBtn.addEventListener('click', async () => {
             const text = noteInput.value.trim();
             const scoreValue = scoreInput.value;
 
             if (text !== '' || selectedImageFile || recordedAudioBlob) {
                 
-                // حالة التعديل لنوتة موجودة (تعديل النص والتقييم فقط)
                 if (editingNoteId) {
                     const now = new Date();
                     const timeString = now.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' });
@@ -338,6 +391,7 @@
                     await update(dbRef(db, `secret_notes/${editingNoteId}`), {
                         content: text,
                         score: scoreValue,
+                        color: selectedNoteColor, // تحديث اللون مع التعديل
                         timestamp: `${dateString} - الساعة ${timeString} (مُعدلة)`
                     });
                     
@@ -345,7 +399,6 @@
                     addBtn.innerText = 'إضافة الملاحظة';
                     addBtn.classList.remove('edit-mode');
                 } 
-                // حالة إضافة نوتة جديدة (نص + ميديا)
                 else {
                     addBtn.innerText = '⏳ جاري الحفظ والرفع...';
                     addBtn.disabled = true;
@@ -373,6 +426,7 @@
                         content: text,
                         timestamp: `${dateString} - الساعة ${timeString}`,
                         score: scoreValue, 
+                        color: selectedNoteColor, // حفظ اللون في الداتابيز
                         isPinned: false,
                         sortOrder: -now.getTime(),
                         imageUrl: imageUrl,
@@ -383,7 +437,6 @@
                     addBtn.disabled = false;
                 }
 
-                // تفريغ الحقول بعد الحفظ
                 resetInputs();
             }
         });
@@ -397,16 +450,16 @@
             imageInput.value = '';
             imgStatus.innerText = '';
             audioStatus.innerText = '';
+            resetColorPalette(); // إرجاع اللون للافتراضي
         }
 
-        // --- 7. عرض البيانات (Realtime) ---
+        // --- عرض البيانات ---
         function loadNotes() {
             onValue(notesRef, (snapshot) => {
                 notesList.innerHTML = '';
                 const data = snapshot.val();
                 
                 if (data) {
-                    // ترتيب المصفوفة: المثبت أولاً، ثم حسب الترتيب المخزن
                     const notesArray = Object.keys(data).map(key => ({ id: key, ...data[key] }))
                     .sort((a, b) => {
                         if (a.isPinned && !b.isPinned) return -1;
@@ -416,9 +469,13 @@
 
                     notesArray.forEach(note => {
                         const li = document.createElement('li');
-                        if(note.isPinned) li.classList.add('pinned-note');
                         
-                        // إعدادات السحب والإفلات
+                        // إضافة كلاس التثبيت و كود اللون للعنصر
+                        if(note.isPinned) li.classList.add('pinned-note');
+                        if(note.color && note.color !== 'default') {
+                            li.setAttribute('data-color', note.color);
+                        }
+                        
                         li.draggable = true;
                         li.addEventListener('dragstart', function() { draggedId = note.id; draggedSortOrder = note.sortOrder; this.style.opacity = '0.5'; });
                         li.addEventListener('dragover', e => e.preventDefault());
@@ -432,10 +489,12 @@
                         });
                         li.addEventListener('dragend', function() { this.style.opacity = '1'; });
 
-                        // تجهيز عناصر الميديا إن وجدت
                         let mediaHTML = '';
                         if (note.imageUrl) mediaHTML += `<img src="${note.imageUrl}" class="note-image" alt="مرفق صورة">`;
                         if (note.audioUrl) mediaHTML += `<audio controls src="${note.audioUrl}" class="note-audio"></audio>`;
+
+                        // حفظ المحتوى الأصلي للنسخ
+                        const rawContent = note.content || '';
 
                         li.innerHTML = `
                             ${mediaHTML}
@@ -447,8 +506,9 @@
                                     ${note.isPinned ? '<span class="pin-badge">📌 متثبتة</span>' : ''}
                                 </div>
                                 <div class="action-buttons">
+                                    <button class="copy-btn" data-content="${escapeHTML(rawContent)}">📋 نسخ</button>
                                     <button class="pin-btn ${note.isPinned ? 'active' : ''}" data-id="${note.id}" data-pinned="${note.isPinned || false}">${note.isPinned ? 'إلغاء التثبيت' : 'تثبيت'}</button>
-                                    <button class="edit-btn" data-id="${note.id}" data-content="${escapeHTML(note.content)}" data-score="${note.score || 50}">تعديل</button>
+                                    <button class="edit-btn" data-id="${note.id}" data-content="${escapeHTML(rawContent)}" data-score="${note.score || 50}" data-color="${note.color || 'default'}">تعديل</button>
                                     <button class="delete-btn" data-id="${note.id}">حذف</button>
                                 </div>
                             </div>
@@ -456,14 +516,33 @@
                         notesList.appendChild(li);
                     });
 
-                    // تشغيل أزرار التثبيت
+                    // تشغيل أزرار النسخ (Clipboard API)
+                    document.querySelectorAll('.copy-btn').forEach(btn => {
+                        btn.addEventListener('click', (e) => {
+                            const textToCopy = e.target.getAttribute('data-content');
+                            if(textToCopy) {
+                                navigator.clipboard.writeText(textToCopy).then(() => {
+                                    // تغيير شكل الزرار مؤقتاً كدليل على النجاح
+                                    const originalText = e.target.innerText;
+                                    e.target.innerText = '✔️ تم النسخ';
+                                    e.target.style.background = '#1dd1a1';
+                                    setTimeout(() => {
+                                        e.target.innerText = originalText;
+                                        e.target.style.background = ''; // يرجع للونه الأصلي في الـ CSS
+                                    }, 2000);
+                                }).catch(err => alert("حدث خطأ أثناء النسخ."));
+                            } else {
+                                alert("لا يوجد نص لنسخه!");
+                            }
+                        });
+                    });
+
                     document.querySelectorAll('.pin-btn').forEach(btn => {
                         btn.addEventListener('click', (e) => {
                             update(dbRef(db, `secret_notes/${e.target.dataset.id}`), { isPinned: !(e.target.dataset.pinned === 'true') });
                         });
                     });
 
-                    // تشغيل أزرار التعديل
                     document.querySelectorAll('.edit-btn').forEach(btn => {
                         btn.addEventListener('click', (e) => {
                             editingNoteId = e.target.dataset.id;
@@ -471,13 +550,18 @@
                             scoreInput.value = e.target.dataset.score;
                             scoreDisplay.innerText = scoreInput.value + '%';
                             
+                            // استرجاع لون النوتة للباليتة
+                            const savedColor = e.target.dataset.color;
+                            colorCircles.forEach(c => c.classList.remove('active'));
+                            document.querySelector(`.color-circle[data-color="${savedColor}"]`).classList.add('active');
+                            selectedNoteColor = savedColor;
+                            
                             addBtn.innerText = 'حفظ التعديلات';
                             addBtn.classList.add('edit-mode');
                             window.scrollTo({ top: 0, behavior: 'smooth' });
                         });
                     });
 
-                    // تشغيل أزرار الحذف
                     document.querySelectorAll('.delete-btn').forEach(btn => {
                         btn.addEventListener('click', (e) => {
                             const idToDel = e.target.dataset.id;
@@ -494,7 +578,6 @@
             });
         }
 
-        // دالة حماية النصوص من أكواد الاختراق (XSS)
         function escapeHTML(str) {
             if(!str) return '';
             return str.replace(/[&<>'"]/g, tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag]));
