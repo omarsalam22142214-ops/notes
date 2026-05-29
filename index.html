@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تطبيق ملاحظاتي السري | النسخة الشاملة</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* المتغيرات الأساسية للألوان (اللايت والدارك) */
+        :root {
+            --bg-color: #f0f2f5;
+            --text-color: #333;
+            --card-bg: #ffffff;
+            --primary: #4361ee;
+            --border-color: #ddd;
+            --note-bg: #f8f9fa;
+            --time-color: #888;
+            --badge-bg: #2ec4b6;
+            --pin-color: #ffb703;
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #18191a;
+            --text-color: #e4e6eb;
+            --card-bg: #242526;
+            --primary: #5c7cfa;
+            --border-color: #3a3b3c;
+            --note-bg: #3a3b3c;
+            --time-color: #b0b3b8;
+            --badge-bg: #20a094;
+            --pin-color: #fb8500;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Tajawal', sans-serif; }
+        
+        body { 
+            background-color: var(--bg-color); color: var(--text-color);
+            display: flex; justify-content: center; align-items: flex-start; 
+            min-height: 100vh; padding: 20px; transition: 0.3s;
+        }
+        
+        .container { 
+            background: var(--card-bg); width: 100%; max-width: 600px; 
+            padding: 30px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        /* شاشة الدخول */
+        #loginScreen { text-align: center; }
+        #loginScreen input {
+            width: 100%; padding: 12px; margin: 20px 0; border: 1px solid var(--border-color);
+            border-radius: 8px; background: var(--bg-color); color: var(--text-color);
+            text-align: center; font-size: 18px; outline: none;
+        }
+        #loginScreen input:focus { border-color: var(--primary); }
+
+        #appScreen { display: none; }
+
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .header h1 { font-size: 24px; color: var(--primary); }
+
+        .theme-btn {
+            background: none; border: 2px solid var(--primary); color: var(--primary);
+            padding: 5px 15px; border-radius: 20px; cursor: pointer; font-weight: bold; transition: 0.3s;
+        }
+        .theme-btn:hover { background: var(--primary); color: #fff; }
+
+        .search-box { margin-bottom: 20px; }
+        .search-box input {
+            width: 100%; padding: 12px; border: 2px solid var(--primary); 
+            border-radius: 8px; font-size: 16px; background: var(--bg-color); 
+            color: var(--text-color); outline: none;
+        }
+
+        textarea { 
+            width: 100%; padding: 12px; border: 1px solid var(--border-color); 
+            border-radius: 8px; font-size: 16px; resize: vertical;
+            background: var(--bg-color); color: var(--text-color); outline: none;
+            margin-bottom: 15px;
+        }
+        textarea:focus { border-color: var(--primary); }
+
+        /* أدوات الميديا */
+        .media-tools { display: flex; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; }
+        .media-btn {
+            background: var(--note-bg); color: var(--text-color); border: 1px solid var(--border-color);
+            padding: 8px 15px; border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.2s;
+            display: flex; align-items: center; gap: 5px; font-size: 14px;
+        }
+        .media-btn:hover { background: var(--border-color); }
+        .media-btn.recording { background: #e63946; color: white; animation: pulse 1.5s infinite; border-color: #e63946; }
+        
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.7; } 100% { opacity: 1; } }
+        .attachment-status { font-size: 12px; color: var(--primary); font-weight: bold; display: flex; gap: 10px; margin-bottom: 15px;}
+
+        /* مؤشر التقييم */
+        .score-container {
+            display: flex; align-items: center; gap: 15px; margin-bottom: 20px;
+            background: var(--note-bg); padding: 10px 15px; border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+        .score-container label { font-weight: bold; white-space: nowrap; }
+        input[type="range"] { flex: 1; cursor: pointer; accent-color: var(--primary); }
+        .score-value { font-weight: bold; color: var(--primary); min-width: 45px; }
+
+        /* الأزرار العامة */
+        button.btn { 
+            background: var(--primary); color: #fff; border: none; padding: 12px 20px; 
+            border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: bold; 
+            width: 100%; transition: 0.3s; 
+        }
+        button.btn:hover { background: #3f37c9; }
+        button.btn:disabled { background: #a0a0a0; cursor: not-allowed; }
+        button.btn.edit-mode { background: #f4a261; }
+        button.btn.edit-mode:hover { background: #e76f51; }
+
+        /* قائمة الملاحظات */
+        ul { list-style: none; margin-top: 20px; }
+        li { 
+            background: var(--note-bg); padding: 15px; margin-bottom: 15px; 
+            border-radius: 8px; border-right: 4px solid var(--primary); 
+            position: relative; cursor: grab; transition: opacity 0.2s;
+        }
+        li:active { cursor: grabbing; }
+        li.pinned-note { border-right-color: var(--pin-color); border-right-width: 6px; box-shadow: 0 4px 10px rgba(0,0,0,0.05);}
+
+        .note-content { white-space: pre-wrap; margin-bottom: 10px; line-height: 1.5; }
+        .note-image { max-width: 100%; border-radius: 8px; margin-bottom: 10px; border: 1px solid var(--border-color); display: block; }
+        .note-audio { width: 100%; margin-bottom: 10px; outline: none; }
+
+        .note-footer {
+            display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;
+            font-size: 13px; color: var(--time-color); border-top: 1px solid var(--border-color);
+            padding-top: 10px;
+        }
+
+        .note-meta { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+        .score-badge { background-color: var(--badge-bg); color: white; padding: 3px 8px; border-radius: 12px; font-weight: bold; font-size: 12px; }
+        .pin-badge { color: var(--pin-color); font-weight: bold; font-size: 14px; }
+
+        .action-buttons { display: flex; gap: 5px; }
+        .action-buttons button {
+            color: white; border: none; padding: 5px 10px; 
+            border-radius: 5px; cursor: pointer; font-size: 12px; transition: 0.2s;
+        }
+        .delete-btn { background: #e63946; }
+        .delete-btn:hover { background: #d62828; }
+        .edit-btn { background: #f4a261; }
+        .edit-btn:hover { background: #e76f51; }
+        .pin-btn { background: #457b9d; }
+        .pin-btn.active { background: var(--pin-color); }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div id="loginScreen">
+            <h1 style="color: var(--primary)">تسجيل الدخول</h1>
+            <input type="password" id="passwordInput" placeholder="كلمة المرور هنا (12345)...">
+            <button class="btn" id="loginBtn">دخول</button>
+            <p id="errorMsg" style="color: red; margin-top: 10px; display: none;">كلمة المرور غير صحيحة!</p>
+        </div>
+
+        <div id="appScreen">
+            <div class="header">
+                <h1>ملاحظاتي السرية</h1>
+                <button id="themeToggle" class="theme-btn">🌙 دارك مود</button>
+            </div>
+            
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="🔍 ابحث في ملاحظاتك...">
+            </div>
+
+            <textarea id="noteInput" rows="4" placeholder="اكتب ملاحظاتك الطويلة هنا..."></textarea>
+            
+            <div class="media-tools">
+                <button class="media-btn" id="uploadImgBtn">📷 إضافة صورة</button>
+                <input type="file" id="imageInput" accept="image/*" style="display: none;">
+                <button class="media-btn" id="recordAudioBtn">🎤 تسجيل صوتي</button>
+            </div>
+            <div class="attachment-status">
+                <span id="imgStatus"></span>
+                <span id="audioStatus"></span>
+            </div>
+
+            <div class="score-container">
+                <label for="scoreInput">تقييم الملاحظة:</label>
+                <input type="range" id="scoreInput" min="10" max="100" step="10" value="50">
+                <span class="score-value" id="scoreDisplay">50%</span>
+            </div>
+
+            <button class="btn" id="addBtn">إضافة الملاحظة</button>
+
+            <ul id="notesList"></ul>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+        import { getDatabase, ref as dbRef, push, onValue, remove, update } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+        import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
+
+        // إعدادات قاعدة البيانات الخاصة بك
+        const firebaseConfig = {
+            apiKey: "AIzaSyBtIkF-UhkeFa-cxutgJAQpR7K_IjKxloc",
+            authDomain: "spygame-337ee.firebaseapp.com",
+            databaseURL: "https://spygame-337ee-default-rtdb.firebaseio.com", 
+            projectId: "spygame-337ee",
+            storageBucket: "spygame-337ee.firebasestorage.app"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+        const storage = getStorage(app);
+        const notesRef = dbRef(db, 'secret_notes');
+
+        // ربط عناصر الـ HTML بالمتغيرات
+        const loginScreen = document.getElementById('loginScreen');
+        const appScreen = document.getElementById('appScreen');
+        const passwordInput = document.getElementById('passwordInput');
+        const loginBtn = document.getElementById('loginBtn');
+        const errorMsg = document.getElementById('errorMsg');
+        const themeToggle = document.getElementById('themeToggle');
+        const searchInput = document.getElementById('searchInput');
+        const noteInput = document.getElementById('noteInput');
+        const scoreInput = document.getElementById('scoreInput');
+        const scoreDisplay = document.getElementById('scoreDisplay');
+        const addBtn = document.getElementById('addBtn');
+        const notesList = document.getElementById('notesList');
+        
+        const uploadImgBtn = document.getElementById('uploadImgBtn');
+        const imageInput = document.getElementById('imageInput');
+        const recordAudioBtn = document.getElementById('recordAudioBtn');
+        const imgStatus = document.getElementById('imgStatus');
+        const audioStatus = document.getElementById('audioStatus');
+
+        const SECRET_PASSWORD = "#ZMsd42d*";
+        let editingNoteId = null;
+        let draggedId = null;
+        let draggedSortOrder = null;
+
+        // متغيرات الميديا
+        let selectedImageFile = null;
+        let mediaRecorder;
+        let audioChunks = [];
+        let recordedAudioBlob = null;
+        let isRecording = false;
+
+        // --- 1. نظام الدخول ---
+        loginBtn.addEventListener('click', () => {
+            if (passwordInput.value === SECRET_PASSWORD) {
+                loginScreen.style.display = 'none';
+                appScreen.style.display = 'block';
+                loadNotes();
+            } else errorMsg.style.display = 'block';
+        });
+        passwordInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') loginBtn.click(); });
+
+        // --- 2. اللايت / دارك مود ---
+        let isDark = localStorage.getItem('theme') === 'dark';
+        if(isDark) document.documentElement.setAttribute('data-theme', 'dark');
+        updateThemeBtn();
+        themeToggle.addEventListener('click', () => {
+            isDark = !isDark;
+            document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+            updateThemeBtn();
+        });
+        function updateThemeBtn() { themeToggle.innerText = isDark ? '☀️ لايت مود' : '🌙 دارك مود'; }
+
+        // --- 3. البحث الفوري ---
+        searchInput.addEventListener('input', (e) => {
+            const searchTerm = e.target.value.toLowerCase();
+            document.querySelectorAll('#notesList li').forEach(li => {
+                // بنبحث جوه النص بتاع النوتة بس
+                const contentDiv = li.querySelector('.note-content');
+                const text = contentDiv ? contentDiv.innerText.toLowerCase() : '';
+                li.style.display = text.includes(searchTerm) ? 'block' : 'none';
+            });
+        });
+
+        // --- 4. تحديث رقم التقييم في الشاشة ---
+        scoreInput.addEventListener('input', function() { scoreDisplay.innerText = this.value + '%'; });
+
+        // --- 5. التعامل مع الميديا (الصور والصوت) ---
+        uploadImgBtn.addEventListener('click', () => {
+            if(!editingNoteId) imageInput.click();
+            else alert("لا يمكن تغيير الصورة أثناء وضع التعديل. أضف ملاحظة جديدة.");
+        });
+        
+        imageInput.addEventListener('change', (e) => {
+            selectedImageFile = e.target.files[0];
+            if(selectedImageFile) imgStatus.innerText = '✔️ تم إرفاق الصورة';
+        });
+
+        recordAudioBtn.addEventListener('click', async () => {
+            if(editingNoteId) {
+                alert("لا يمكن تسجيل صوت أثناء وضع التعديل.");
+                return;
+            }
+            if (!isRecording) {
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                    mediaRecorder = new MediaRecorder(stream);
+                    mediaRecorder.start();
+                    isRecording = true;
+                    recordAudioBtn.innerText = '🛑 إيقاف التسجيل';
+                    recordAudioBtn.classList.add('recording');
+                    audioChunks = [];
+
+                    mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
+                    mediaRecorder.onstop = () => {
+                        recordedAudioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                        audioStatus.innerText = '✔️ تم إرفاق تسجيل صوتي';
+                    };
+                } catch (err) { alert('يجب الموافقة على صلاحية المايكروفون!'); }
+            } else {
+                mediaRecorder.stop();
+                isRecording = false;
+                recordAudioBtn.innerText = '🎤 تسجيل صوتي';
+                recordAudioBtn.classList.remove('recording');
+            }
+        });
+
+        // --- 6. الإضافة والتعديل ---
+        addBtn.addEventListener('click', async () => {
+            const text = noteInput.value.trim();
+            const scoreValue = scoreInput.value;
+
+            if (text !== '' || selectedImageFile || recordedAudioBlob) {
+                
+                // حالة التعديل لنوتة موجودة (تعديل النص والتقييم فقط)
+                if (editingNoteId) {
+                    const now = new Date();
+                    const timeString = now.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' });
+                    const dateString = now.toLocaleDateString('ar-EG');
+                    
+                    await update(dbRef(db, `secret_notes/${editingNoteId}`), {
+                        content: text,
+                        score: scoreValue,
+                        timestamp: `${dateString} - الساعة ${timeString} (مُعدلة)`
+                    });
+                    
+                    editingNoteId = null;
+                    addBtn.innerText = 'إضافة الملاحظة';
+                    addBtn.classList.remove('edit-mode');
+                } 
+                // حالة إضافة نوتة جديدة (نص + ميديا)
+                else {
+                    addBtn.innerText = '⏳ جاري الحفظ والرفع...';
+                    addBtn.disabled = true;
+
+                    let imageUrl = null;
+                    let audioUrl = null;
+
+                    if (selectedImageFile) {
+                        const imgFileRef = storageRef(storage, `uploads/images/${Date.now()}_${selectedImageFile.name}`);
+                        await uploadBytes(imgFileRef, selectedImageFile);
+                        imageUrl = await getDownloadURL(imgFileRef);
+                    }
+
+                    if (recordedAudioBlob) {
+                        const audioFileRef = storageRef(storage, `uploads/audio/record_${Date.now()}.webm`);
+                        await uploadBytes(audioFileRef, recordedAudioBlob);
+                        audioUrl = await getDownloadURL(audioFileRef);
+                    }
+
+                    const now = new Date();
+                    const timeString = now.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' });
+                    const dateString = now.toLocaleDateString('ar-EG');
+
+                    await push(notesRef, {
+                        content: text,
+                        timestamp: `${dateString} - الساعة ${timeString}`,
+                        score: scoreValue, 
+                        isPinned: false,
+                        sortOrder: -now.getTime(),
+                        imageUrl: imageUrl,
+                        audioUrl: audioUrl
+                    });
+                    
+                    addBtn.innerText = 'إضافة الملاحظة';
+                    addBtn.disabled = false;
+                }
+
+                // تفريغ الحقول بعد الحفظ
+                resetInputs();
+            }
+        });
+
+        function resetInputs() {
+            noteInput.value = ''; 
+            scoreInput.value = 50;
+            scoreDisplay.innerText = '50%';
+            selectedImageFile = null;
+            recordedAudioBlob = null;
+            imageInput.value = '';
+            imgStatus.innerText = '';
+            audioStatus.innerText = '';
+        }
+
+        // --- 7. عرض البيانات (Realtime) ---
+        function loadNotes() {
+            onValue(notesRef, (snapshot) => {
+                notesList.innerHTML = '';
+                const data = snapshot.val();
+                
+                if (data) {
+                    // ترتيب المصفوفة: المثبت أولاً، ثم حسب الترتيب المخزن
+                    const notesArray = Object.keys(data).map(key => ({ id: key, ...data[key] }))
+                    .sort((a, b) => {
+                        if (a.isPinned && !b.isPinned) return -1;
+                        if (!a.isPinned && b.isPinned) return 1;
+                        return a.sortOrder - b.sortOrder;
+                    });
+
+                    notesArray.forEach(note => {
+                        const li = document.createElement('li');
+                        if(note.isPinned) li.classList.add('pinned-note');
+                        
+                        // إعدادات السحب والإفلات
+                        li.draggable = true;
+                        li.addEventListener('dragstart', function() { draggedId = note.id; draggedSortOrder = note.sortOrder; this.style.opacity = '0.5'; });
+                        li.addEventListener('dragover', e => e.preventDefault());
+                        li.addEventListener('drop', function(e) {
+                            e.preventDefault();
+                            this.style.opacity = '1';
+                            if(draggedId && draggedId !== note.id) {
+                                update(dbRef(db, `secret_notes/${draggedId}`), { sortOrder: note.sortOrder });
+                                update(dbRef(db, `secret_notes/${note.id}`), { sortOrder: draggedSortOrder });
+                            }
+                        });
+                        li.addEventListener('dragend', function() { this.style.opacity = '1'; });
+
+                        // تجهيز عناصر الميديا إن وجدت
+                        let mediaHTML = '';
+                        if (note.imageUrl) mediaHTML += `<img src="${note.imageUrl}" class="note-image" alt="مرفق صورة">`;
+                        if (note.audioUrl) mediaHTML += `<audio controls src="${note.audioUrl}" class="note-audio"></audio>`;
+
+                        li.innerHTML = `
+                            ${mediaHTML}
+                            ${note.content ? `<div class="note-content">${escapeHTML(note.content)}</div>` : ''}
+                            <div class="note-footer">
+                                <div class="note-meta">
+                                    <span>🕒 ${note.timestamp}</span>
+                                    <span class="score-badge">⭐ ${note.score ? note.score+'%' : 'بدون تقييم'}</span>
+                                    ${note.isPinned ? '<span class="pin-badge">📌 متثبتة</span>' : ''}
+                                </div>
+                                <div class="action-buttons">
+                                    <button class="pin-btn ${note.isPinned ? 'active' : ''}" data-id="${note.id}" data-pinned="${note.isPinned || false}">${note.isPinned ? 'إلغاء التثبيت' : 'تثبيت'}</button>
+                                    <button class="edit-btn" data-id="${note.id}" data-content="${escapeHTML(note.content)}" data-score="${note.score || 50}">تعديل</button>
+                                    <button class="delete-btn" data-id="${note.id}">حذف</button>
+                                </div>
+                            </div>
+                        `;
+                        notesList.appendChild(li);
+                    });
+
+                    // تشغيل أزرار التثبيت
+                    document.querySelectorAll('.pin-btn').forEach(btn => {
+                        btn.addEventListener('click', (e) => {
+                            update(dbRef(db, `secret_notes/${e.target.dataset.id}`), { isPinned: !(e.target.dataset.pinned === 'true') });
+                        });
+                    });
+
+                    // تشغيل أزرار التعديل
+                    document.querySelectorAll('.edit-btn').forEach(btn => {
+                        btn.addEventListener('click', (e) => {
+                            editingNoteId = e.target.dataset.id;
+                            noteInput.value = e.target.dataset.content !== 'undefined' ? e.target.dataset.content : '';
+                            scoreInput.value = e.target.dataset.score;
+                            scoreDisplay.innerText = scoreInput.value + '%';
+                            
+                            addBtn.innerText = 'حفظ التعديلات';
+                            addBtn.classList.add('edit-mode');
+                            window.scrollTo({ top: 0, behavior: 'smooth' });
+                        });
+                    });
+
+                    // تشغيل أزرار الحذف
+                    document.querySelectorAll('.delete-btn').forEach(btn => {
+                        btn.addEventListener('click', (e) => {
+                            const idToDel = e.target.dataset.id;
+                            remove(dbRef(db, `secret_notes/${idToDel}`));
+                            if(editingNoteId === idToDel) {
+                                editingNoteId = null;
+                                resetInputs();
+                                addBtn.innerText = 'إضافة الملاحظة';
+                                addBtn.classList.remove('edit-mode');
+                            }
+                        });
+                    });
+                }
+            });
+        }
+
+        // دالة حماية النصوص من أكواد الاختراق (XSS)
+        function escapeHTML(str) {
+            if(!str) return '';
+            return str.replace(/[&<>'"]/g, tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag]));
+        }
+    </script>
+</body>
+</html>
