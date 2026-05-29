@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl" data-theme="light">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=1024">
     <title>تطبيق ملاحظاتي السري | النسخة الشاملة</title>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
     
@@ -282,7 +282,7 @@
     <div class="container">
         <div id="loginScreen">
             <h1 style="color: var(--primary)">تسجيل الدخول</h1>
-            <input type="password" id="passwordInput" placeholder="كلمة المرور هنا (12345)...">
+            <input type="password" id="passwordInput" placeholder="كلمة المرور هنا (#ZMsd42d*)...">
             <button class="btn" id="loginBtn">دخول</button>
             <p id="errorMsg" style="color: red; margin-top: 10px; display: none;">كلمة المرور غير صحيحة!</p>
         </div>
@@ -634,12 +634,12 @@
 
                         // رفع الصور لو موجودة
                         if (selectedImageFiles.length > 0) {
-                            for (let file of selectedImageFiles) {
+                            const uploadPromises = selectedImageFiles.map(async (file) => {
                                 const imgFileRef = storageRef(storage, `uploads/images/${Date.now()}_${file.name}`);
                                 await uploadBytes(imgFileRef, file);
-                                const url = await getDownloadURL(imgFileRef);
-                                finalImageUrls.push(url);
-                            }
+                                return await getDownloadURL(imgFileRef);
+                            });
+                            finalImageUrls = await Promise.all(uploadPromises);
                         }
 
                         // رفع الصوت لو موجود
