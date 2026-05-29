@@ -7,7 +7,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
     
     <style>
-        /* المتغيرات الأساسية للألوان (اللايت والدارك) */
         :root {
             --bg-color: #f0f2f5;
             --text-color: #333;
@@ -19,7 +18,6 @@
             --badge-bg: #2ec4b6;
             --pin-color: #ffb703;
             
-            /* ألوان الملاحظات (Light Mode) */
             --note-red: #ffe5e5;
             --note-blue: #e5f0ff;
             --note-yellow: #fffde5;
@@ -37,7 +35,6 @@
             --badge-bg: #20a094;
             --pin-color: #fb8500;
             
-            /* ألوان الملاحظات (Dark Mode) - درجات غامقة ومريحة للعين */
             --note-red: #4a2525;
             --note-blue: #25334a;
             --note-yellow: #4a4a25;
@@ -53,11 +50,11 @@
         }
         
         .container { 
-            background: var(--card-bg); width: 100%; max-width: 600px; 
+            background: var(--card-bg); width: 100%; max-width: 1000px; 
             padding: 30px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.2);
         }
 
-        #loginScreen { text-align: center; }
+        #loginScreen { text-align: center; max-width: 500px; margin: 0 auto; }
         #loginScreen input {
             width: 100%; padding: 12px; margin: 20px 0; border: 1px solid var(--border-color);
             border-radius: 8px; background: var(--bg-color); color: var(--text-color);
@@ -67,7 +64,7 @@
 
         #appScreen { display: none; }
 
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px;}
         .header h1 { font-size: 24px; color: var(--primary); }
 
         .theme-btn {
@@ -76,12 +73,31 @@
         }
         .theme-btn:hover { background: var(--primary); color: #fff; }
 
+        .backup-tools { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+        .backup-btn {
+            flex: 1; background: var(--note-bg); color: var(--text-color); border: 1px solid var(--border-color);
+            padding: 10px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 14px; transition: 0.2s;
+            min-width: 200px;
+        }
+        .backup-btn:hover { background: var(--border-color); }
+        .backup-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
         .search-box { margin-bottom: 20px; }
         .search-box input {
             width: 100%; padding: 12px; border: 2px solid var(--primary); 
             border-radius: 8px; font-size: 16px; background: var(--bg-color); 
             color: var(--text-color); outline: none;
         }
+
+        .input-section { max-width: 800px; margin: 0 auto; }
+
+        .title-input {
+            width: 100%; padding: 12px; border: 1px solid var(--border-color); 
+            border-radius: 8px; font-size: 18px; font-weight: bold;
+            background: var(--bg-color); color: var(--text-color); outline: none;
+            margin-bottom: 10px;
+        }
+        .title-input:focus { border-color: var(--primary); }
 
         textarea { 
             width: 100%; padding: 12px; border: 1px solid var(--border-color); 
@@ -91,10 +107,7 @@
         }
         textarea:focus { border-color: var(--primary); }
 
-        /* باليتة الألوان الجديدة */
-        .color-palette {
-            display: flex; gap: 10px; margin-bottom: 15px; align-items: center;
-        }
+        .color-palette { display: flex; gap: 10px; margin-bottom: 15px; align-items: center; }
         .color-palette label { font-size: 14px; font-weight: bold; }
         .color-circle {
             width: 25px; height: 25px; border-radius: 50%; cursor: pointer;
@@ -140,40 +153,67 @@
         button.btn.edit-mode { background: #f4a261; }
         button.btn.edit-mode:hover { background: #e76f51; }
 
-        ul { list-style: none; margin-top: 20px; }
-        
-        /* تأثيرات ألوان الملاحظات في القائمة */
-        li { 
-            background: var(--note-bg); padding: 15px; margin-bottom: 15px; 
-            border-radius: 8px; border-right: 4px solid var(--primary); 
-            position: relative; cursor: grab; transition: opacity 0.2s, background-color 0.3s;
+        ul { 
+            list-style: none; 
+            margin-top: 30px; 
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 15px;
+            align-items: start;
         }
+        
+        li { 
+            background: var(--note-bg); padding: 15px; 
+            border-radius: 8px; border-right: 4px solid var(--primary); 
+            position: relative; cursor: pointer; /* غيرناها لـ pointer عشان تبان إنها بتنضغط */
+            transition: opacity 0.2s, background-color 0.3s, transform 0.2s, box-shadow 0.2s;
+            display: flex;
+            flex-direction: column;
+            min-height: 200px; 
+        }
+        
+        li:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        
         li[data-color="red"] { background-color: var(--note-red); }
         li[data-color="blue"] { background-color: var(--note-blue); }
         li[data-color="yellow"] { background-color: var(--note-yellow); }
         li[data-color="green"] { background-color: var(--note-green); }
 
-        li:active { cursor: grabbing; }
         li.pinned-note { border-right-color: var(--pin-color); border-right-width: 6px; box-shadow: 0 4px 10px rgba(0,0,0,0.05);}
 
-        .note-content { white-space: pre-wrap; margin-bottom: 10px; line-height: 1.5; }
-        .note-image { max-width: 100%; border-radius: 8px; margin-bottom: 10px; border: 1px solid var(--border-color); display: block; }
+        .note-title-display { font-size: 18px; font-weight: bold; color: var(--primary); margin-bottom: 8px; }
+        
+        .note-content { 
+            white-space: pre-wrap; 
+            margin-bottom: 10px; 
+            line-height: 1.5; 
+            max-height: 250px; 
+            overflow-y: auto; 
+            padding-left: 5px;
+        }
+        
+        .note-content::-webkit-scrollbar { width: 5px; }
+        .note-content::-webkit-scrollbar-track { background: transparent; }
+        .note-content::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 10px; }
+
+        .note-image { max-width: 100%; border-radius: 8px; margin-bottom: 10px; border: 1px solid var(--border-color); display: block; object-fit: contain; max-height: 300px; }
         .note-audio { width: 100%; margin-bottom: 10px; outline: none; }
 
         .note-footer {
             display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;
             font-size: 13px; color: var(--time-color); border-top: 1px solid var(--border-color);
             padding-top: 10px;
+            margin-top: auto; 
         }
 
         .note-meta { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
         .score-badge { background-color: var(--badge-bg); color: white; padding: 3px 8px; border-radius: 12px; font-weight: bold; font-size: 12px; }
         .pin-badge { color: var(--pin-color); font-weight: bold; font-size: 14px; }
 
-        .action-buttons { display: flex; gap: 5px; flex-wrap: wrap;}
+        .action-buttons { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 5px;}
         .action-buttons button {
             color: white; border: none; padding: 5px 10px; 
-            border-radius: 5px; cursor: pointer; font-size: 12px; transition: 0.2s;
+            border-radius: 5px; cursor: pointer; font-size: 12px; transition: 0.2s; flex: 1; text-align: center;
         }
         .delete-btn { background: #e63946; }
         .delete-btn:hover { background: #d62828; }
@@ -181,11 +221,60 @@
         .edit-btn:hover { background: #e76f51; }
         .pin-btn { background: #457b9d; }
         .pin-btn.active { background: var(--pin-color); }
-        .copy-btn { background: #2a9d8f; } /* لون زرار النسخ */
+        .copy-btn { background: #2a9d8f; }
         .copy-btn:hover { background: #21867a; }
+
+        /* تنسيقات النافذة المنبثقة (Modal) الجديدة */
+        .modal-overlay {
+            display: none; /* مخفية افتراضياً */
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6); /* خلفية شفافة غامقة */
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background: var(--card-bg);
+            width: 100%; max-width: 700px;
+            border-radius: 15px; padding: 30px 30px 20px 30px;
+            position: relative;
+            max-height: 90vh; /* عشان لو الملاحظة عملاقة متطلعش بره الشاشة */
+            overflow-y: auto;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+            transition: background-color 0.3s;
+        }
+        
+        /* ألوان الـ Modal */
+        .modal-content[data-color="red"] { background-color: var(--note-red); }
+        .modal-content[data-color="blue"] { background-color: var(--note-blue); }
+        .modal-content[data-color="yellow"] { background-color: var(--note-yellow); }
+        .modal-content[data-color="green"] { background-color: var(--note-green); }
+
+        .close-modal {
+            position: absolute; top: 15px; left: 20px;
+            font-size: 28px; cursor: pointer; color: var(--text-color);
+            font-weight: bold; line-height: 1; transition: 0.2s;
+        }
+        .close-modal:hover { color: #e63946; transform: scale(1.1); }
+        
+        .modal-body .note-content { max-height: none; overflow-y: visible; font-size: 18px; } /* نلغي الحد الأقصى جوه الـ Modal */
+        .modal-body .note-title-display { font-size: 24px; margin-bottom: 20px; }
+        .modal-body .note-image { max-height: 500px; margin: 0 auto 20px auto; }
     </style>
 </head>
 <body>
+
+    <div id="noteModal" class="modal-overlay">
+        <div class="modal-content" id="modalCard">
+            <span class="close-modal" id="closeModal">&times;</span>
+            <div id="modalBody" class="modal-body">
+                </div>
+        </div>
+    </div>
 
     <div class="container">
         <div id="loginScreen">
@@ -201,38 +290,47 @@
                 <button id="themeToggle" class="theme-btn">🌙 دارك مود</button>
             </div>
             
+            <div class="backup-tools">
+                <button class="backup-btn" id="exportBtn">📥 تصدير (Backup)</button>
+                <button class="backup-btn" id="importBtn">📤 استيراد (Keep أو Backup)</button>
+                <input type="file" id="importInput" accept=".json" multiple style="display: none;">
+            </div>
+
             <div class="search-box">
-                <input type="text" id="searchInput" placeholder="🔍 ابحث في ملاحظاتك...">
+                <input type="text" id="searchInput" placeholder="🔍 ابحث في العناوين أو المحتوى...">
             </div>
 
-            <textarea id="noteInput" rows="4" placeholder="اكتب ملاحظاتك الطويلة هنا..."></textarea>
-            
-            <div class="color-palette">
-                <label>لون الملاحظة:</label>
-                <div class="color-circle color-default active" data-color="default" title="افتراضي"></div>
-                <div class="color-circle color-red" data-color="red" title="أحمر (مهم)"></div>
-                <div class="color-circle color-blue" data-color="blue" title="أزرق (عمل)"></div>
-                <div class="color-circle color-yellow" data-color="yellow" title="أصفر (أفكار)"></div>
-                <div class="color-circle color-green" data-color="green" title="أخضر (منجز)"></div>
-            </div>
+            <div class="input-section">
+                <input type="text" id="noteTitleInput" class="title-input" placeholder="عنوان الملاحظة (اختياري)...">
+                <textarea id="noteInput" rows="4" placeholder="اكتب تفاصيل ملاحظتك هنا..."></textarea>
+                
+                <div class="color-palette">
+                    <label>لون الملاحظة:</label>
+                    <div class="color-circle color-default active" data-color="default" title="افتراضي"></div>
+                    <div class="color-circle color-red" data-color="red" title="أحمر (مهم)"></div>
+                    <div class="color-circle color-blue" data-color="blue" title="أزرق (عمل)"></div>
+                    <div class="color-circle color-yellow" data-color="yellow" title="أصفر (أفكار)"></div>
+                    <div class="color-circle color-green" data-color="green" title="أخضر (منجز)"></div>
+                </div>
 
-            <div class="media-tools">
-                <button class="media-btn" id="uploadImgBtn">📷 إضافة صورة</button>
-                <input type="file" id="imageInput" accept="image/*" style="display: none;">
-                <button class="media-btn" id="recordAudioBtn">🎤 تسجيل صوتي</button>
-            </div>
-            <div class="attachment-status">
-                <span id="imgStatus"></span>
-                <span id="audioStatus"></span>
-            </div>
+                <div class="media-tools">
+                    <button class="media-btn" id="uploadImgBtn">📷 إضافة صورة</button>
+                    <input type="file" id="imageInput" accept="image/*" style="display: none;">
+                    <button class="media-btn" id="recordAudioBtn">🎤 تسجيل صوتي</button>
+                </div>
+                <div class="attachment-status">
+                    <span id="imgStatus"></span>
+                    <span id="audioStatus"></span>
+                </div>
 
-            <div class="score-container">
-                <label for="scoreInput">تقييم الملاحظة:</label>
-                <input type="range" id="scoreInput" min="10" max="100" step="10" value="50">
-                <span class="score-value" id="scoreDisplay">50%</span>
-            </div>
+                <div class="score-container">
+                    <label for="scoreInput">تقييم الملاحظة:</label>
+                    <input type="range" id="scoreInput" min="10" max="100" step="10" value="50">
+                    <span class="score-value" id="scoreDisplay">50%</span>
+                </div>
 
-            <button class="btn" id="addBtn">إضافة الملاحظة</button>
+                <button class="btn" id="addBtn">إضافة الملاحظة</button>
+            </div>
 
             <ul id="notesList"></ul>
         </div>
@@ -240,7 +338,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-        import { getDatabase, ref as dbRef, push, onValue, remove, update } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+        import { getDatabase, ref as dbRef, push, onValue, remove, update, get } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
         import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
 
         const firebaseConfig = {
@@ -263,6 +361,8 @@
         const errorMsg = document.getElementById('errorMsg');
         const themeToggle = document.getElementById('themeToggle');
         const searchInput = document.getElementById('searchInput');
+        
+        const noteTitleInput = document.getElementById('noteTitleInput');
         const noteInput = document.getElementById('noteInput');
         const scoreInput = document.getElementById('scoreInput');
         const scoreDisplay = document.getElementById('scoreDisplay');
@@ -275,11 +375,21 @@
         const imgStatus = document.getElementById('imgStatus');
         const audioStatus = document.getElementById('audioStatus');
 
+        const exportBtn = document.getElementById('exportBtn');
+        const importBtn = document.getElementById('importBtn');
+        const importInput = document.getElementById('importInput');
+
+        // عناصر الـ Modal
+        const noteModal = document.getElementById('noteModal');
+        const modalCard = document.getElementById('modalCard');
+        const closeModal = document.getElementById('closeModal');
+        const modalBody = document.getElementById('modalBody');
+
         const SECRET_PASSWORD = "#ZMsd42d*";
         let editingNoteId = null;
         let draggedId = null;
         let draggedSortOrder = null;
-        let selectedNoteColor = 'default'; // متغير لحفظ اللون المختار
+        let selectedNoteColor = 'default';
 
         let selectedImageFile = null;
         let mediaRecorder;
@@ -287,26 +397,27 @@
         let recordedAudioBlob = null;
         let isRecording = false;
 
-        // --- نظام اختيار الألوان ---
+        // إغلاق النافذة المنبثقة
+        closeModal.addEventListener('click', () => { noteModal.style.display = 'none'; });
+        window.addEventListener('click', (e) => { 
+            if(e.target === noteModal) noteModal.style.display = 'none'; 
+        });
+
         const colorCircles = document.querySelectorAll('.color-circle');
         colorCircles.forEach(circle => {
             circle.addEventListener('click', (e) => {
-                // بنشيل علامة الاختيار من كله ونحطها على اللي اختارناه
                 colorCircles.forEach(c => c.classList.remove('active'));
                 e.target.classList.add('active');
-                // بنحفظ كود اللون
                 selectedNoteColor = e.target.getAttribute('data-color');
             });
         });
 
-        // دالة لإعادة اللون للافتراضي بعد الحفظ
         function resetColorPalette() {
             colorCircles.forEach(c => c.classList.remove('active'));
             document.querySelector('.color-circle[data-color="default"]').classList.add('active');
             selectedNoteColor = 'default';
         }
 
-        // --- نظام الدخول ---
         loginBtn.addEventListener('click', () => {
             if (passwordInput.value === SECRET_PASSWORD) {
                 loginScreen.style.display = 'none';
@@ -316,7 +427,6 @@
         });
         passwordInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') loginBtn.click(); });
 
-        // --- اللايت / دارك مود ---
         let isDark = localStorage.getItem('theme') === 'dark';
         if(isDark) document.documentElement.setAttribute('data-theme', 'dark');
         updateThemeBtn();
@@ -328,19 +438,127 @@
         });
         function updateThemeBtn() { themeToggle.innerText = isDark ? '☀️ لايت مود' : '🌙 دارك مود'; }
 
-        // --- البحث الفوري ---
         searchInput.addEventListener('input', (e) => {
             const searchTerm = e.target.value.toLowerCase();
             document.querySelectorAll('#notesList li').forEach(li => {
+                const titleDiv = li.querySelector('.note-title-display');
                 const contentDiv = li.querySelector('.note-content');
-                const text = contentDiv ? contentDiv.innerText.toLowerCase() : '';
-                li.style.display = text.includes(searchTerm) ? 'block' : 'none';
+                const titleText = titleDiv ? titleDiv.innerText.toLowerCase() : '';
+                const contentText = contentDiv ? contentDiv.innerText.toLowerCase() : '';
+                li.style.display = (titleText.includes(searchTerm) || contentText.includes(searchTerm)) ? 'flex' : 'none';
             });
         });
 
         scoreInput.addEventListener('input', function() { scoreDisplay.innerText = this.value + '%'; });
 
-        // --- التعامل مع الميديا ---
+        exportBtn.addEventListener('click', async () => {
+            try {
+                exportBtn.innerText = '⏳ جاري التصدير...';
+                const snapshot = await get(notesRef);
+                if (snapshot.exists()) {
+                    const data = snapshot.val();
+                    const jsonString = JSON.stringify(data, null, 2);
+                    const blob = new Blob([jsonString], { type: "application/json" });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `notes_backup_${new Date().toISOString().split('T')[0]}.json`;
+                    a.click();
+                    URL.revokeObjectURL(url);
+                } else {
+                    alert("مفيش ملاحظات لتصديرها حالياً!");
+                }
+            } catch (error) {
+                alert("حصل خطأ أثناء التصدير.");
+            } finally {
+                exportBtn.innerText = '📥 تصدير (Backup)';
+            }
+        });
+
+        importBtn.addEventListener('click', () => importInput.click());
+        importInput.addEventListener('change', async (e) => {
+            const files = e.target.files;
+            if (files.length === 0) return;
+
+            importBtn.innerText = '⏳ جاري الاستيراد...';
+            importBtn.disabled = true;
+
+            let importCount = 0;
+
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                try {
+                    const text = await file.text();
+                    const importedData = JSON.parse(text);
+
+                    if (importedData.textContent !== undefined || importedData.listContent !== undefined) {
+                        if (importedData.isTrashed) continue; 
+
+                        let content = importedData.textContent || '';
+                        if (importedData.listContent) {
+                            content = importedData.listContent.map(item => (item.isChecked ? '✅ ' : '❌ ') + item.text).join('\n');
+                        }
+
+                        let color = 'default';
+                        if(importedData.color === 'RED') color = 'red';
+                        if(importedData.color === 'BLUE' || importedData.color === 'TEAL' || importedData.color === 'CERULEAN') color = 'blue';
+                        if(importedData.color === 'YELLOW') color = 'yellow';
+                        if(importedData.color === 'GREEN') color = 'green';
+
+                        let dateString = new Date().toLocaleDateString('ar-EG');
+                        let sortOrderValue = -new Date().getTime();
+                        if (importedData.userEditedTimestampUsec) {
+                            const keepDate = new Date(importedData.userEditedTimestampUsec / 1000);
+                            dateString = `${keepDate.toLocaleDateString('ar-EG')} - الساعة ${keepDate.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' })}`;
+                            sortOrderValue = -(importedData.userEditedTimestampUsec / 1000);
+                        }
+
+                        await push(notesRef, {
+                            title: importedData.title || '',
+                            content: content,
+                            timestamp: dateString,
+                            score: 50, 
+                            color: color,
+                            isPinned: importedData.isPinned || false,
+                            sortOrder: sortOrderValue,
+                            imageUrl: null,
+                            audioUrl: null
+                        });
+                        importCount++;
+                    }
+                    else {
+                        let notesToImport = [];
+                        if (Array.isArray(importedData)) notesToImport = importedData;
+                        else if (typeof importedData === 'object') notesToImport = Object.values(importedData);
+
+                        for (let note of notesToImport) {
+                            await push(notesRef, {
+                                title: note.title || '',
+                                content: note.content || '',
+                                timestamp: note.timestamp || new Date().toLocaleDateString('ar-EG'),
+                                score: note.score || 50,
+                                color: note.color || 'default',
+                                isPinned: note.isPinned || false,
+                                sortOrder: note.sortOrder || -new Date().getTime(),
+                                imageUrl: note.imageUrl || null,
+                                audioUrl: note.audioUrl || null
+                            });
+                            importCount++;
+                        }
+                    }
+                } catch (err) {
+                    console.error("متجاهل الملف ده عشان صيغته مش مفهومة:", file.name);
+                }
+            }
+
+            if(importCount > 0) alert(`عاش! تم استيراد ${importCount} ملاحظة بنجاح.`);
+            else alert("ملقيناش بيانات صالحة للاستيراد في الملفات دي.");
+            
+            importInput.value = '';
+            importBtn.innerText = '📤 استيراد (Keep أو Backup)';
+            importBtn.disabled = false;
+        });
+
         uploadImgBtn.addEventListener('click', () => {
             if(!editingNoteId) imageInput.click();
             else alert("لا يمكن تغيير الصورة أثناء وضع التعديل.");
@@ -376,22 +594,22 @@
             }
         });
 
-        // --- الإضافة والتعديل ---
         addBtn.addEventListener('click', async () => {
+            const title = noteTitleInput.value.trim();
             const text = noteInput.value.trim();
             const scoreValue = scoreInput.value;
 
-            if (text !== '' || selectedImageFile || recordedAudioBlob) {
-                
+            if (title !== '' || text !== '' || selectedImageFile || recordedAudioBlob) {
                 if (editingNoteId) {
                     const now = new Date();
                     const timeString = now.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' });
                     const dateString = now.toLocaleDateString('ar-EG');
                     
                     await update(dbRef(db, `secret_notes/${editingNoteId}`), {
+                        title: title,
                         content: text,
                         score: scoreValue,
-                        color: selectedNoteColor, // تحديث اللون مع التعديل
+                        color: selectedNoteColor,
                         timestamp: `${dateString} - الساعة ${timeString} (مُعدلة)`
                     });
                     
@@ -423,10 +641,11 @@
                     const dateString = now.toLocaleDateString('ar-EG');
 
                     await push(notesRef, {
+                        title: title,
                         content: text,
                         timestamp: `${dateString} - الساعة ${timeString}`,
                         score: scoreValue, 
-                        color: selectedNoteColor, // حفظ اللون في الداتابيز
+                        color: selectedNoteColor,
                         isPinned: false,
                         sortOrder: -now.getTime(),
                         imageUrl: imageUrl,
@@ -436,12 +655,14 @@
                     addBtn.innerText = 'إضافة الملاحظة';
                     addBtn.disabled = false;
                 }
-
                 resetInputs();
+            } else {
+                alert("اكتب عنوان أو محتوى للملاحظة عشان تتحفظ!");
             }
         });
 
         function resetInputs() {
+            noteTitleInput.value = ''; 
             noteInput.value = ''; 
             scoreInput.value = 50;
             scoreDisplay.innerText = '50%';
@@ -450,10 +671,38 @@
             imageInput.value = '';
             imgStatus.innerText = '';
             audioStatus.innerText = '';
-            resetColorPalette(); // إرجاع اللون للافتراضي
+            resetColorPalette();
         }
 
-        // --- عرض البيانات ---
+        // --- دالة فتح الـ Modal ---
+        function openNoteModal(noteData) {
+            // تظبيط لون النافذة
+            if(noteData.color && noteData.color !== 'default') {
+                modalCard.setAttribute('data-color', noteData.color);
+            } else {
+                modalCard.removeAttribute('data-color');
+            }
+
+            let mediaHTML = '';
+            if (noteData.imageUrl) mediaHTML += `<img src="${noteData.imageUrl}" class="note-image" alt="مرفق صورة">`;
+            if (noteData.audioUrl) mediaHTML += `<audio controls src="${noteData.audioUrl}" class="note-audio"></audio>`;
+
+            const rawTitle = noteData.title || '';
+            const rawContent = noteData.content || '';
+
+            modalBody.innerHTML = `
+                ${rawTitle ? `<div class="note-title-display">${escapeHTML(rawTitle)}</div>` : ''}
+                ${mediaHTML}
+                ${rawContent ? `<div class="note-content">${escapeHTML(rawContent)}</div>` : ''}
+                <div class="note-meta" style="margin-top: 20px; padding-top: 15px; border-top: 1px solid var(--border-color);">
+                    <span>🕒 ${noteData.timestamp}</span>
+                    <span class="score-badge">⭐ ${noteData.score ? noteData.score+'%' : 'بدون تقييم'}</span>
+                </div>
+            `;
+            
+            noteModal.style.display = 'flex';
+        }
+
         function loadNotes() {
             onValue(notesRef, (snapshot) => {
                 notesList.innerHTML = '';
@@ -470,7 +719,6 @@
                     notesArray.forEach(note => {
                         const li = document.createElement('li');
                         
-                        // إضافة كلاس التثبيت و كود اللون للعنصر
                         if(note.isPinned) li.classList.add('pinned-note');
                         if(note.color && note.color !== 'default') {
                             li.setAttribute('data-color', note.color);
@@ -489,16 +737,26 @@
                         });
                         li.addEventListener('dragend', function() { this.style.opacity = '1'; });
 
+                        // حدث فتح الـ Modal لما تضغط على الكارت
+                        li.addEventListener('click', (e) => {
+                            // بنقوله لو المستخدم ضغط على زرار من الزراير اللي تحت، متفتحش النافذة عشان ميحصلش تداخل
+                            if(e.target.tagName.toLowerCase() === 'button' || e.target.closest('button')) return;
+                            
+                            openNoteModal(note);
+                        });
+
                         let mediaHTML = '';
                         if (note.imageUrl) mediaHTML += `<img src="${note.imageUrl}" class="note-image" alt="مرفق صورة">`;
                         if (note.audioUrl) mediaHTML += `<audio controls src="${note.audioUrl}" class="note-audio"></audio>`;
 
-                        // حفظ المحتوى الأصلي للنسخ
+                        const rawTitle = note.title || '';
                         const rawContent = note.content || '';
+                        const copyText = (rawTitle ? rawTitle + '\n\n' : '') + rawContent;
 
                         li.innerHTML = `
+                            ${rawTitle ? `<div class="note-title-display">${escapeHTML(rawTitle)}</div>` : ''}
                             ${mediaHTML}
-                            ${note.content ? `<div class="note-content">${escapeHTML(note.content)}</div>` : ''}
+                            ${rawContent ? `<div class="note-content">${escapeHTML(rawContent)}</div>` : ''}
                             <div class="note-footer">
                                 <div class="note-meta">
                                     <span>🕒 ${note.timestamp}</span>
@@ -506,9 +764,9 @@
                                     ${note.isPinned ? '<span class="pin-badge">📌 متثبتة</span>' : ''}
                                 </div>
                                 <div class="action-buttons">
-                                    <button class="copy-btn" data-content="${escapeHTML(rawContent)}">📋 نسخ</button>
+                                    <button class="copy-btn" data-content="${escapeHTML(copyText)}">📋 نسخ</button>
                                     <button class="pin-btn ${note.isPinned ? 'active' : ''}" data-id="${note.id}" data-pinned="${note.isPinned || false}">${note.isPinned ? 'إلغاء التثبيت' : 'تثبيت'}</button>
-                                    <button class="edit-btn" data-id="${note.id}" data-content="${escapeHTML(rawContent)}" data-score="${note.score || 50}" data-color="${note.color || 'default'}">تعديل</button>
+                                    <button class="edit-btn" data-id="${note.id}" data-title="${escapeHTML(rawTitle)}" data-content="${escapeHTML(rawContent)}" data-score="${note.score || 50}" data-color="${note.color || 'default'}">تعديل</button>
                                     <button class="delete-btn" data-id="${note.id}">حذف</button>
                                 </div>
                             </div>
@@ -516,19 +774,17 @@
                         notesList.appendChild(li);
                     });
 
-                    // تشغيل أزرار النسخ (Clipboard API)
                     document.querySelectorAll('.copy-btn').forEach(btn => {
                         btn.addEventListener('click', (e) => {
                             const textToCopy = e.target.getAttribute('data-content');
                             if(textToCopy) {
                                 navigator.clipboard.writeText(textToCopy).then(() => {
-                                    // تغيير شكل الزرار مؤقتاً كدليل على النجاح
                                     const originalText = e.target.innerText;
                                     e.target.innerText = '✔️ تم النسخ';
                                     e.target.style.background = '#1dd1a1';
                                     setTimeout(() => {
                                         e.target.innerText = originalText;
-                                        e.target.style.background = ''; // يرجع للونه الأصلي في الـ CSS
+                                        e.target.style.background = ''; 
                                     }, 2000);
                                 }).catch(err => alert("حدث خطأ أثناء النسخ."));
                             } else {
@@ -546,11 +802,13 @@
                     document.querySelectorAll('.edit-btn').forEach(btn => {
                         btn.addEventListener('click', (e) => {
                             editingNoteId = e.target.dataset.id;
+                            
+                            noteTitleInput.value = e.target.dataset.title !== 'undefined' ? e.target.dataset.title : '';
                             noteInput.value = e.target.dataset.content !== 'undefined' ? e.target.dataset.content : '';
+                            
                             scoreInput.value = e.target.dataset.score;
                             scoreDisplay.innerText = scoreInput.value + '%';
                             
-                            // استرجاع لون النوتة للباليتة
                             const savedColor = e.target.dataset.color;
                             colorCircles.forEach(c => c.classList.remove('active'));
                             document.querySelector(`.color-circle[data-color="${savedColor}"]`).classList.add('active');
