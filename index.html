@@ -165,7 +165,7 @@
         li { 
             background: var(--note-bg); padding: 15px; 
             border-radius: 8px; border-right: 4px solid var(--primary); 
-            position: relative; cursor: pointer; /* غيرناها لـ pointer عشان تبان إنها بتنضغط */
+            position: relative; cursor: pointer; 
             transition: opacity 0.2s, background-color 0.3s, transform 0.2s, box-shadow 0.2s;
             display: flex;
             flex-direction: column;
@@ -183,20 +183,34 @@
 
         .note-title-display { font-size: 18px; font-weight: bold; color: var(--primary); margin-bottom: 8px; }
         
+        /* === التعديل الجذري لشريط التمرير والمحتوى === */
         .note-content { 
             white-space: pre-wrap; 
+            word-wrap: break-word;     /* بيكسر الكلمات الطويلة زي الإيميلات */
+            word-break: break-word;    /* عشان ميعملش سكرول أفقي */
             margin-bottom: 10px; 
             line-height: 1.5; 
             max-height: 250px; 
-            overflow-y: auto; 
+            overflow-y: auto;          /* سكرول رأسي بس */
+            overflow-x: hidden;        /* بيمنع السكرول الأفقي نهائياً */
             padding-left: 5px;
+            padding-right: 5px;
         }
         
-        .note-content::-webkit-scrollbar { width: 5px; }
+        /* تجميل شريط التمرير عشان ميبقاش شكله وحش زي الصورة */
+        .note-content::-webkit-scrollbar { width: 6px; }
         .note-content::-webkit-scrollbar-track { background: transparent; }
-        .note-content::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 10px; }
+        .note-content::-webkit-scrollbar-thumb { background: rgba(136, 136, 136, 0.5); border-radius: 10px; }
+        .note-content::-webkit-scrollbar-thumb:hover { background: rgba(136, 136, 136, 0.8); }
 
-        .note-image { max-width: 100%; border-radius: 8px; margin-bottom: 10px; border: 1px solid var(--border-color); display: block; object-fit: contain; max-height: 300px; }
+        .image-gallery { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 10px; }
+        .image-gallery .note-image { 
+            flex-grow: 1; width: calc(50% - 5px); 
+            max-height: 120px; object-fit: cover; 
+            border-radius: 8px; border: 1px solid var(--border-color); 
+        }
+        .single-image { width: 100%; max-height: 300px; object-fit: contain; border-radius: 8px; margin-bottom: 10px; border: 1px solid var(--border-color); display: block; }
+
         .note-audio { width: 100%; margin-bottom: 10px; outline: none; }
 
         .note-footer {
@@ -224,46 +238,36 @@
         .copy-btn { background: #2a9d8f; }
         .copy-btn:hover { background: #21867a; }
 
-        /* تنسيقات النافذة المنبثقة (Modal) الجديدة */
         .modal-overlay {
-            display: none; /* مخفية افتراضياً */
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.6); /* خلفية شفافة غامقة */
-            z-index: 1000;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-            backdrop-filter: blur(5px);
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6); z-index: 1000; justify-content: center; align-items: center;
+            padding: 20px; backdrop-filter: blur(5px);
         }
 
         .modal-content {
-            background: var(--card-bg);
-            width: 100%; max-width: 700px;
-            border-radius: 15px; padding: 30px 30px 20px 30px;
-            position: relative;
-            max-height: 90vh; /* عشان لو الملاحظة عملاقة متطلعش بره الشاشة */
-            overflow-y: auto;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+            background: var(--card-bg); width: 100%; max-width: 700px;
+            border-radius: 15px; padding: 30px 30px 20px 30px; position: relative;
+            max-height: 90vh; overflow-y: auto; box-shadow: 0 10px 40px rgba(0,0,0,0.4);
             transition: background-color 0.3s;
         }
         
-        /* ألوان الـ Modal */
         .modal-content[data-color="red"] { background-color: var(--note-red); }
         .modal-content[data-color="blue"] { background-color: var(--note-blue); }
         .modal-content[data-color="yellow"] { background-color: var(--note-yellow); }
         .modal-content[data-color="green"] { background-color: var(--note-green); }
 
         .close-modal {
-            position: absolute; top: 15px; left: 20px;
-            font-size: 28px; cursor: pointer; color: var(--text-color);
+            position: absolute; top: 15px; left: 20px; font-size: 28px; cursor: pointer; color: var(--text-color);
             font-weight: bold; line-height: 1; transition: 0.2s;
         }
         .close-modal:hover { color: #e63946; transform: scale(1.1); }
         
-        .modal-body .note-content { max-height: none; overflow-y: visible; font-size: 18px; } /* نلغي الحد الأقصى جوه الـ Modal */
+        .modal-body .note-content { max-height: none; overflow-y: visible; font-size: 18px; } 
         .modal-body .note-title-display { font-size: 24px; margin-bottom: 20px; }
-        .modal-body .note-image { max-height: 500px; margin: 0 auto 20px auto; }
+        .modal-body .image-gallery { flex-direction: column; gap: 15px; }
+        .modal-body .image-gallery .note-image, .modal-body .single-image { 
+            width: 100%; max-height: none; object-fit: contain; margin-bottom: 0; 
+        }
     </style>
 </head>
 <body>
@@ -271,8 +275,7 @@
     <div id="noteModal" class="modal-overlay">
         <div class="modal-content" id="modalCard">
             <span class="close-modal" id="closeModal">&times;</span>
-            <div id="modalBody" class="modal-body">
-                </div>
+            <div id="modalBody" class="modal-body"></div>
         </div>
     </div>
 
@@ -314,8 +317,8 @@
                 </div>
 
                 <div class="media-tools">
-                    <button class="media-btn" id="uploadImgBtn">📷 إضافة صورة</button>
-                    <input type="file" id="imageInput" accept="image/*" style="display: none;">
+                    <button class="media-btn" id="uploadImgBtn">📷 إضافة صورة/صور</button>
+                    <input type="file" id="imageInput" accept="image/*" multiple style="display: none;">
                     <button class="media-btn" id="recordAudioBtn">🎤 تسجيل صوتي</button>
                 </div>
                 <div class="attachment-status">
@@ -379,7 +382,6 @@
         const importBtn = document.getElementById('importBtn');
         const importInput = document.getElementById('importInput');
 
-        // عناصر الـ Modal
         const noteModal = document.getElementById('noteModal');
         const modalCard = document.getElementById('modalCard');
         const closeModal = document.getElementById('closeModal');
@@ -391,13 +393,12 @@
         let draggedSortOrder = null;
         let selectedNoteColor = 'default';
 
-        let selectedImageFile = null;
+        let selectedImageFiles = [];
         let mediaRecorder;
         let audioChunks = [];
         let recordedAudioBlob = null;
         let isRecording = false;
 
-        // إغلاق النافذة المنبثقة
         closeModal.addEventListener('click', () => { noteModal.style.display = 'none'; });
         window.addEventListener('click', (e) => { 
             if(e.target === noteModal) noteModal.style.display = 'none'; 
@@ -521,7 +522,7 @@
                             color: color,
                             isPinned: importedData.isPinned || false,
                             sortOrder: sortOrderValue,
-                            imageUrl: null,
+                            imageUrls: [],
                             audioUrl: null
                         });
                         importCount++;
@@ -540,7 +541,8 @@
                                 color: note.color || 'default',
                                 isPinned: note.isPinned || false,
                                 sortOrder: note.sortOrder || -new Date().getTime(),
-                                imageUrl: note.imageUrl || null,
+                                imageUrl: note.imageUrl || null, 
+                                imageUrls: note.imageUrls || [], 
                                 audioUrl: note.audioUrl || null
                             });
                             importCount++;
@@ -561,11 +563,16 @@
 
         uploadImgBtn.addEventListener('click', () => {
             if(!editingNoteId) imageInput.click();
-            else alert("لا يمكن تغيير الصورة أثناء وضع التعديل.");
+            else alert("لا يمكن تغيير الصور أثناء وضع التعديل.");
         });
+        
         imageInput.addEventListener('change', (e) => {
-            selectedImageFile = e.target.files[0];
-            if(selectedImageFile) imgStatus.innerText = '✔️ تم إرفاق الصورة';
+            selectedImageFiles = Array.from(e.target.files);
+            if(selectedImageFiles.length > 0) {
+                imgStatus.innerText = `✔️ تم إرفاق ${selectedImageFiles.length} صورة/صور`;
+            } else {
+                imgStatus.innerText = '';
+            }
         });
 
         recordAudioBtn.addEventListener('click', async () => {
@@ -594,68 +601,78 @@
             }
         });
 
+        // === تعديل زرار الإضافة لمنع التعليق ===
         addBtn.addEventListener('click', async () => {
             const title = noteTitleInput.value.trim();
             const text = noteInput.value.trim();
             const scoreValue = scoreInput.value;
 
-            if (title !== '' || text !== '' || selectedImageFile || recordedAudioBlob) {
-                if (editingNoteId) {
-                    const now = new Date();
-                    const timeString = now.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' });
-                    const dateString = now.toLocaleDateString('ar-EG');
-                    
-                    await update(dbRef(db, `secret_notes/${editingNoteId}`), {
-                        title: title,
-                        content: text,
-                        score: scoreValue,
-                        color: selectedNoteColor,
-                        timestamp: `${dateString} - الساعة ${timeString} (مُعدلة)`
-                    });
-                    
-                    editingNoteId = null;
-                    addBtn.innerText = 'إضافة الملاحظة';
-                    addBtn.classList.remove('edit-mode');
-                } 
-                else {
-                    addBtn.innerText = '⏳ جاري الحفظ والرفع...';
-                    addBtn.disabled = true;
+            if (title !== '' || text !== '' || selectedImageFiles.length > 0 || recordedAudioBlob) {
+                try {
+                    if (editingNoteId) {
+                        const now = new Date();
+                        const timeString = now.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' });
+                        const dateString = now.toLocaleDateString('ar-EG');
+                        
+                        await update(dbRef(db, `secret_notes/${editingNoteId}`), {
+                            title: title,
+                            content: text,
+                            score: scoreValue,
+                            color: selectedNoteColor,
+                            timestamp: `${dateString} - الساعة ${timeString} (مُعدلة)`
+                        });
+                        
+                        editingNoteId = null;
+                        addBtn.classList.remove('edit-mode');
+                    } 
+                    else {
+                        addBtn.innerText = `⏳ جاري الحفظ والرفع...`;
+                        addBtn.disabled = true;
 
-                    let imageUrl = null;
-                    let audioUrl = null;
+                        let finalImageUrls = [];
+                        let audioUrl = null;
 
-                    if (selectedImageFile) {
-                        const imgFileRef = storageRef(storage, `uploads/images/${Date.now()}_${selectedImageFile.name}`);
-                        await uploadBytes(imgFileRef, selectedImageFile);
-                        imageUrl = await getDownloadURL(imgFileRef);
+                        // رفع الصور لو موجودة
+                        if (selectedImageFiles.length > 0) {
+                            for (let file of selectedImageFiles) {
+                                const imgFileRef = storageRef(storage, `uploads/images/${Date.now()}_${file.name}`);
+                                await uploadBytes(imgFileRef, file);
+                                const url = await getDownloadURL(imgFileRef);
+                                finalImageUrls.push(url);
+                            }
+                        }
+
+                        // رفع الصوت لو موجود
+                        if (recordedAudioBlob) {
+                            const audioFileRef = storageRef(storage, `uploads/audio/record_${Date.now()}.webm`);
+                            await uploadBytes(audioFileRef, recordedAudioBlob);
+                            audioUrl = await getDownloadURL(audioFileRef);
+                        }
+
+                        const now = new Date();
+                        const timeString = now.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' });
+                        const dateString = now.toLocaleDateString('ar-EG');
+
+                        await push(notesRef, {
+                            title: title,
+                            content: text,
+                            timestamp: `${dateString} - الساعة ${timeString}`,
+                            score: scoreValue, 
+                            color: selectedNoteColor,
+                            isPinned: false,
+                            sortOrder: -now.getTime(),
+                            imageUrls: finalImageUrls, 
+                            audioUrl: audioUrl
+                        });
                     }
-
-                    if (recordedAudioBlob) {
-                        const audioFileRef = storageRef(storage, `uploads/audio/record_${Date.now()}.webm`);
-                        await uploadBytes(audioFileRef, recordedAudioBlob);
-                        audioUrl = await getDownloadURL(audioFileRef);
-                    }
-
-                    const now = new Date();
-                    const timeString = now.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' });
-                    const dateString = now.toLocaleDateString('ar-EG');
-
-                    await push(notesRef, {
-                        title: title,
-                        content: text,
-                        timestamp: `${dateString} - الساعة ${timeString}`,
-                        score: scoreValue, 
-                        color: selectedNoteColor,
-                        isPinned: false,
-                        sortOrder: -now.getTime(),
-                        imageUrl: imageUrl,
-                        audioUrl: audioUrl
-                    });
-                    
+                    resetInputs();
+                } catch (error) {
+                    console.error("حدث خطأ:", error);
+                    alert("حصل مشكلة أثناء الحفظ! تأكد من إن مساحة التخزين Storage متفعلة في Firebase وإنك متصل بالنت.");
+                } finally {
                     addBtn.innerText = 'إضافة الملاحظة';
                     addBtn.disabled = false;
                 }
-                resetInputs();
             } else {
                 alert("اكتب عنوان أو محتوى للملاحظة عشان تتحفظ!");
             }
@@ -666,7 +683,7 @@
             noteInput.value = ''; 
             scoreInput.value = 50;
             scoreDisplay.innerText = '50%';
-            selectedImageFile = null;
+            selectedImageFiles = []; 
             recordedAudioBlob = null;
             imageInput.value = '';
             imgStatus.innerText = '';
@@ -674,19 +691,35 @@
             resetColorPalette();
         }
 
-        // --- دالة فتح الـ Modal ---
-        function openNoteModal(noteData) {
-            // تظبيط لون النافذة
-            if(noteData.color && noteData.color !== 'default') {
-                modalCard.setAttribute('data-color', noteData.color);
-            } else {
-                modalCard.removeAttribute('data-color');
+        function generateMediaHTML(noteData) {
+            let html = '';
+            let allImages = [];
+            
+            if(noteData.imageUrl) allImages.push(noteData.imageUrl);
+            if(noteData.imageUrls && noteData.imageUrls.length > 0) {
+                allImages = allImages.concat(noteData.imageUrls);
             }
 
-            let mediaHTML = '';
-            if (noteData.imageUrl) mediaHTML += `<img src="${noteData.imageUrl}" class="note-image" alt="مرفق صورة">`;
-            if (noteData.audioUrl) mediaHTML += `<audio controls src="${noteData.audioUrl}" class="note-audio"></audio>`;
+            if (allImages.length === 1) {
+                html += `<img src="${allImages[0]}" class="single-image" alt="مرفق صورة">`;
+            } else if (allImages.length > 1) {
+                html += `<div class="image-gallery">`;
+                allImages.forEach(url => {
+                    html += `<img src="${url}" class="note-image" alt="مرفق صورة">`;
+                });
+                html += `</div>`;
+            }
 
+            if (noteData.audioUrl) html += `<audio controls src="${noteData.audioUrl}" class="note-audio"></audio>`;
+            
+            return html;
+        }
+
+        function openNoteModal(noteData) {
+            if(noteData.color && noteData.color !== 'default') modalCard.setAttribute('data-color', noteData.color);
+            else modalCard.removeAttribute('data-color');
+
+            const mediaHTML = generateMediaHTML(noteData);
             const rawTitle = noteData.title || '';
             const rawContent = noteData.content || '';
 
@@ -720,9 +753,7 @@
                         const li = document.createElement('li');
                         
                         if(note.isPinned) li.classList.add('pinned-note');
-                        if(note.color && note.color !== 'default') {
-                            li.setAttribute('data-color', note.color);
-                        }
+                        if(note.color && note.color !== 'default') li.setAttribute('data-color', note.color);
                         
                         li.draggable = true;
                         li.addEventListener('dragstart', function() { draggedId = note.id; draggedSortOrder = note.sortOrder; this.style.opacity = '0.5'; });
@@ -737,18 +768,12 @@
                         });
                         li.addEventListener('dragend', function() { this.style.opacity = '1'; });
 
-                        // حدث فتح الـ Modal لما تضغط على الكارت
                         li.addEventListener('click', (e) => {
-                            // بنقوله لو المستخدم ضغط على زرار من الزراير اللي تحت، متفتحش النافذة عشان ميحصلش تداخل
                             if(e.target.tagName.toLowerCase() === 'button' || e.target.closest('button')) return;
-                            
                             openNoteModal(note);
                         });
 
-                        let mediaHTML = '';
-                        if (note.imageUrl) mediaHTML += `<img src="${note.imageUrl}" class="note-image" alt="مرفق صورة">`;
-                        if (note.audioUrl) mediaHTML += `<audio controls src="${note.audioUrl}" class="note-audio"></audio>`;
-
+                        const mediaHTML = generateMediaHTML(note);
                         const rawTitle = note.title || '';
                         const rawContent = note.content || '';
                         const copyText = (rawTitle ? rawTitle + '\n\n' : '') + rawContent;
